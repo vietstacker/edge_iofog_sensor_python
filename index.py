@@ -10,17 +10,10 @@ import json
 import logging
 log = logging.getLogger(__name__)
 
-def get_client():
-    try:
-        ioclient = Client()
-        return ioclient
-    except IoFogException as e:
-        log.error('Error getting Iofog Client: ', e)
-
-IoClient = get_client()
+IoClient = Client()
 
 def update_config():
-    attempt_limit = 10
+    attempt_limit = 5
     while attempt_limit > 0:
         try:
             config = IoClient.get_config()
@@ -35,21 +28,7 @@ def update_config():
     return current_config
 
 
-class ControlListener(IoFogControlWsListener):
-    def on_control_signal(self):
-        update_config()
-
-class MessageListener(IoFogMessageWsListener):
-    # Receipt of received message
-    def on_receipt(self, message_id, timestamp):
-        print ('Receipt: {} {}'.format(message_id, timestamp))
-
-
 def send_sensor_data():
-    # Get config
-    update_config()
-    IoClient.establish_message_ws_connection(MessageListener())
-    IoClient.establish_control_ws_connection(ControlListener())
     log.info("Starting sending data")
     #TODO: Get data from csv and send
     msg = IoMessage()
@@ -69,8 +48,22 @@ def send_sensor_data():
                 'rpm': row[5],
             }
             contentdata = json.dumps(contentdata)
-            msg.contentdata = contentdata
+            msg.contentdata = bytearray(contentdata)
             IoClient.post_message_via_socket(msg)
+
+
+class ControlListener(IoFogControlWsListener):
+    def on_control_signal(self):
+        update_config()
+
+class MessageListener(IoFogMessageWsListener):
+    # Receipt of received message
+    def on_receipt(self, message_id, timestamp):
+        print ('Receipt: {} {}'.format(message_id, timestamp))
+
+update_config()
+IoClient.establish_message_ws_connection(MessageListener())
+IoClient.establish_control_ws_connection(ControlListener())
 
 while True:
     send_sensor_data()
