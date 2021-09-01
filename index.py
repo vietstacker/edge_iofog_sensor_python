@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 
 IoClient = Client()
 
+
 # def update_config():
 #     attempt_limit = 5
 #     while attempt_limit > 0:
@@ -26,6 +27,7 @@ IoClient = Client()
 #         return
 #     current_config = config
 #     return current_config
+
 
 
 def send_sensor_data():
