@@ -50,7 +50,7 @@ def send_sensor_data():
                 'rpm': row[5],
             }
             contentdata = json.dumps(contentdata)
-            msg.contentdata = bytearray(contentdata)
+            msg.contentdata = contentdata
             IoClient.post_message_via_socket(msg)
 
 
