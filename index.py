@@ -12,7 +12,7 @@ import json
 import logging
 log = logging.getLogger(__name__)
 
-IoClient = Client()
+IoClient = Client(host='iofog', port='54321')
 
 
 # def update_config():
