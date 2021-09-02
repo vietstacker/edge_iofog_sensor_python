@@ -7,6 +7,7 @@ from csv import reader
 from datetime import datetime
 import json
 import time
+import base64
 
 # from iofog.microservices.log import Logger
 # log = Logger('logger1')
@@ -41,18 +42,23 @@ def send_sensor_data():
         "acceleration": "0.52431",
         "rpm": "2078.3"
     }
-
+    print("Before json dump")
     contentdata = json.dumps(data)
-    json_msg = {
-        'INFO_TYPE': 'application/json',
-        'INFO_FORMAT': 'text/utf-8',
-        'CONTENT_DATA': contentdata
-    }
-        #print(json_msg)
-    msg = IoMessage.from_json(json_msg)
-        #print(msg)
+    print("After json dump")
+    try:
+        msg = IoMessage()
+    except IoFogException as e:
+        print("Error: ", e)
+    msg.infotype = 'application/json'
+    msg.infoformat = 'text/utf-8'
+    contentdata = base64.b64decode(contentdata)
+    msg.contentdata = str.encode(contentdata)
+    #msg = IoMessage.from_json(json_msg)
     print("Sending")
-    IoClient.post_message_via_socket(msg)
+    try:
+        IoClient.post_message_via_socket(msg)
+    except IoFogException as e:
+        print("Error: ", e)
     # with open('data.csv', 'r') as read_obj:
     #     csv_reader = reader(read_obj)
     #     data = list(csv_reader)
@@ -83,7 +89,7 @@ def send_sensor_data():
 class ControlListener(IoFogControlWsListener):
     def on_control_signal(self):
         # update_config()
-        return
+        print("Control listener")
 
 class MessageListener(IoFogMessageWsListener):
     # Receipt of received message
@@ -96,4 +102,5 @@ IoClient.establish_control_ws_connection(ControlListener())
 
 while True:
     send_sensor_data()
-    time.sleep(1)
+    #time.sleep(1)
+    print("resend")
