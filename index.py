@@ -7,8 +7,8 @@ from csv import reader
 from datetime import datetime
 import json
 
-import logging
-log = logging.getLogger(__name__)
+from iofog.microservices.log import Logger
+log = Logger('logger1')
 
 IoClient = Client()
 
@@ -28,29 +28,30 @@ IoClient = Client()
 #     current_config = config
 #     return current_config
 
-
-
 def send_sensor_data():
     log.info("Starting sending data")
-    #TODO: Get data from csv and send
-    msg = IoMessage()
-    msg.infotype = 'application/json'
-    msg.infoformat = 'text/utf-8'
-
+    print("STARTING")
     with open('data.csv', 'r') as read_obj:
         csv_reader = reader(read_obj)
         # Iterate over each row in the csv using reader object
         for row in csv_reader:
         # row variable is a list that represents a row in csv
         # time = (row[0] * 1000)
-            contentdata = {
+            data = {
                 'time': str(datetime.now()),
                 'speed': float(row[1]) * 2.23694,
                 'acceleration': row[4],
                 'rpm': row[5],
             }
-            contentdata = json.dumps(contentdata)
-            msg.contentdata = contentdata
+
+            contentdata = json.dumps(data)
+            json_msg = {
+                'INFO_TYPE': 'application/json',
+                'INFO_FORMAT': 'text/utf-8',
+                'CONTENT_DATA': data
+            }
+            msg = IoMessage.from_json(json_msg)
+            print(msg)
             IoClient.post_message_via_socket(msg)
 
 
@@ -64,7 +65,7 @@ class MessageListener(IoFogMessageWsListener):
     def on_receipt(self, message_id, timestamp):
         print ('Receipt: {} {}'.format(message_id, timestamp))
 
-#update_config()
+# update_config()
 IoClient.establish_message_ws_connection(MessageListener())
 IoClient.establish_control_ws_connection(ControlListener())
 
