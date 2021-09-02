@@ -7,8 +7,10 @@ from csv import reader
 from datetime import datetime
 import json
 
-from iofog.microservices.log import Logger
-log = Logger('logger1')
+# from iofog.microservices.log import Logger
+# log = Logger('logger1')
+import logging
+log = logging.getLogger(__name__)
 
 IoClient = Client()
 
