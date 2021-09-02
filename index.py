@@ -35,28 +35,29 @@ def send_sensor_data():
     print("STARTING")
     with open('data.csv', 'r') as read_obj:
         csv_reader = reader(read_obj)
+        data = list(csv_reader)
         # Iterate over each row in the csv using reader object
-        for row in csv_reader:
-        # row variable is a list that represents a row in csv
-        # time = (row[0] * 1000)
-            data = {
-                'time': str(datetime.now()),
-                'speed': float(row[1]) * 2.23694,
-                'acceleration': row[4],
-                'rpm': row[5],
-            }
+    for row in data:
+    # row variable is a list that represents a row in csv
+    # time = (row[0] * 1000)
+        data = {
+            'time': str(datetime.now()),
+            'speed': float(row[1]) * 2.23694,
+            'acceleration': row[4],
+            'rpm': row[5],
+        }
 
-            contentdata = json.dumps(data)
-            json_msg = {
-                'INFO_TYPE': 'application/json',
-                'INFO_FORMAT': 'text/utf-8',
-                'CONTENT_DATA': contentdata
-            }
-            #print(json_msg)
-            msg = IoMessage.from_json(json_msg)
-            #print(msg)
-            print("Sending")
-            IoClient.post_message_via_socket(msg)
+        contentdata = json.dumps(data)
+        json_msg = {
+            'INFO_TYPE': 'application/json',
+            'INFO_FORMAT': 'text/utf-8',
+            'CONTENT_DATA': contentdata
+        }
+        #print(json_msg)
+        msg = IoMessage.from_json(json_msg)
+        #print(msg)
+        print("Sending")
+        IoClient.post_message_via_socket(msg)
 
 
 class ControlListener(IoFogControlWsListener):
