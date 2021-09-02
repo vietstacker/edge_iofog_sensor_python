@@ -6,6 +6,7 @@ from iofog.microservices.listener import *
 from csv import reader
 from datetime import datetime
 import json
+import time
 
 # from iofog.microservices.log import Logger
 # log = Logger('logger1')
@@ -33,31 +34,50 @@ IoClient = Client(host='iofog', port='54321')
 def send_sensor_data():
     log.info("Starting sending data")
     print("STARTING")
-    with open('data.csv', 'r') as read_obj:
-        csv_reader = reader(read_obj)
-        data = list(csv_reader)
-        # Iterate over each row in the csv using reader object
-    for row in data:
-    # row variable is a list that represents a row in csv
-    # time = (row[0] * 1000)
-        data = {
-            'time': str(datetime.now()),
-            'speed': float(row[1]) * 2.23694,
-            'acceleration': row[4],
-            'rpm': row[5],
-        }
 
-        contentdata = json.dumps(data)
-        json_msg = {
-            'INFO_TYPE': 'application/json',
-            'INFO_FORMAT': 'text/utf-8',
-            'CONTENT_DATA': contentdata
-        }
+    data = {
+        "time": 1540855847710,
+        "speed": 41.71445712,
+        "acceleration": "0.52431",
+        "rpm": "2078.3"
+    }
+
+    contentdata = json.dumps(data)
+    json_msg = {
+        'INFO_TYPE': 'application/json',
+        'INFO_FORMAT': 'text/utf-8',
+        'CONTENT_DATA': contentdata
+    }
         #print(json_msg)
-        msg = IoMessage.from_json(json_msg)
+    msg = IoMessage.from_json(json_msg)
         #print(msg)
-        print("Sending")
-        IoClient.post_message_via_socket(msg)
+    print("Sending")
+    IoClient.post_message_via_socket(msg)
+    # with open('data.csv', 'r') as read_obj:
+    #     csv_reader = reader(read_obj)
+    #     data = list(csv_reader)
+    #     # Iterate over each row in the csv using reader object
+    # for row in data:
+    # # row variable is a list that represents a row in csv
+    # # time = (row[0] * 1000)
+    #     data = {
+    #         'time': str(datetime.now()),
+    #         'speed': float(row[1]) * 2.23694,
+    #         'acceleration': row[4],
+    #         'rpm': row[5],
+    #     }
+
+    #     contentdata = json.dumps(data)
+    #     json_msg = {
+    #         'INFO_TYPE': 'application/json',
+    #         'INFO_FORMAT': 'text/utf-8',
+    #         'CONTENT_DATA': contentdata
+    #     }
+    #     #print(json_msg)
+    #     msg = IoMessage.from_json(json_msg)
+    #     #print(msg)
+    #     print("Sending")
+    #     IoClient.post_message_via_socket(msg)
 
 
 class ControlListener(IoFogControlWsListener):
@@ -76,3 +96,4 @@ IoClient.establish_control_ws_connection(ControlListener())
 
 while True:
     send_sensor_data()
+    time.sleep(1)
