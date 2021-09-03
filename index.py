@@ -47,12 +47,13 @@ def send_sensor_data():
     print("After json dump")
     try:
         msg = IoMessage()
+        msg.infotype = 'application/json'
+        msg.infoformat = 'text/utf-8'
+        contentdata = base64.b64decode(contentdata)
+        msg.contentdata = str.encode(contentdata)
     except IoFogException as e:
         print("Error: ", e)
-    msg.infotype = 'application/json'
-    msg.infoformat = 'text/utf-8'
-    contentdata = base64.b64decode(contentdata)
-    msg.contentdata = str.encode(contentdata)
+ 
     #msg = IoMessage.from_json(json_msg)
     print("Sending")
     try:
@@ -102,5 +103,5 @@ IoClient.establish_control_ws_connection(ControlListener())
 
 while True:
     send_sensor_data()
-    #time.sleep(1)
+    time.sleep(1)
     print("resend")
