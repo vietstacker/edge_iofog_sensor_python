@@ -53,6 +53,8 @@ def send_sensor_data():
         msg.contentdata = str.encode(contentdata)
     except IoFogException as e:
         print("Error: ", e)
+    except Exception as er:
+        print("Error general: ", er)
  
     #msg = IoMessage.from_json(json_msg)
     print("Sending")
